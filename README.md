@@ -59,6 +59,7 @@ int Pthread_rwlock_destroy(pthread_rwlock_t *rwlock);
 
 ### Important Functions Briefly Explained
 #### `main(int argc, char **argv)`
+`main`: main proxy routine - listens for client requests and creates a new thread to process and forward each one as they come.
 ```C
 int main(int argc, char **argv)
 {
@@ -88,9 +89,9 @@ int main(int argc, char **argv)
   }
 }
 ```
-`main`: main proxy routine - listens for client requests and creates a new thread to process and forward each one as they come.
 
 #### `void *thread(void *fd)`
+`thread`: connect to the client on the `[fd]` and forward request.  The most important part of this is the conversation of the input from a `void*` to an `int`, eliminating a potentially disastrous race condition.
 ```C
 void *thread(void *fd) 
 {
@@ -105,9 +106,9 @@ void *thread(void *fd)
   Close(connection);  
 }
 ```
-`thread`: connect to the client on the `[fd]` and forward request.  The most important part of this is the conversation of the input from a `void*` to an `int`, eliminating a potentially disastrous race condition.
 
 #### `void connect_req(int connection)`
+`connect_req`: check for errors in the client request, parse the request, open a connection with the server, and finally, forward the request to the server.
 ```C
 void connect_req(int connection)                
 { 
@@ -152,9 +153,11 @@ void connect_req(int connection)
   }
 }
 ```
-`connect_req`: check for errors in the client request, parse the request, open a connection with the server, and finally, forward the request to the server.
 
 #### `forward_req(int server, int client, rio_t *requio, char *host, char *path)`
+This is definitely the beef of the proxy as it does some seriously risky string manipulation that happens to get really messy with memory.  Regardless, it's a beautiful solution :)
+`void forward_req(int server, int client, rio_t *requio, 
+                 char *host, char *path)`: forward the client's request to the server; use file descriptor server & read client headers from &requio.
 ```C
 void forward_req(int server, int client, rio_t *requio, 
                  char *host, char *path) 
@@ -230,9 +233,9 @@ void forward_req(int server, int client, rio_t *requio,
   flush_strs(host, path, object);
 }
 ```
-This is definitely the beef of the proxy as it does some seriously risky string manipulation that happens to get really messy with memory.  Regardless, it's a beautiful solution :)
-`void forward_req(int server, int client, rio_t *requio, 
-                 char *host, char *path)`: forward the client's request to the server; use file descriptor server & read client headers from &requio.
+
+## pcache.c
+This is the other most important file as it's the implementation of my personal cache for the proxy.  It's fairly straightforward so if you're interested that's the best place to learn about it.
 
 ## Resources 
 * CS:APP package:
