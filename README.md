@@ -156,6 +156,7 @@ void connect_req(int connection)
 
 #### `forward_req(int server, int client, rio_t *requio, char *host, char *path)`
 This is definitely the beef of the proxy as it does some seriously risky string manipulation that happens to get really messy with memory.  Regardless, it's a beautiful solution :)
+
 `void forward_req(int server, int client, rio_t *requio, 
                  char *host, char *path)`: forward the client's request to the server; use file descriptor server & read client headers from &requio.
 ```C
